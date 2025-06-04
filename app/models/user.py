@@ -11,6 +11,21 @@ class User(db.Model):
      
      rol = db.Column(db.String(20), default="empleado") 
      state = db.Column(db.String(20), default="activo") 
-     created_at = db.Column(db.DateTime, default=datetime.now()) 
+     created_at = db.Column(db.DateTime, default=datetime.now())
+     #Relaciones inversas
+     orders = db.relationship("Order", backref="users", lazy=True)
+
+     def to_dict(self, orders:bool=False):
+        user = {
+            'id': self.id,
+            'name': self.name,
+            'email': self.email,
+            'rol': self.rol,
+            'state': self.state,
+            'created_ad': self.created_at,
+        }
+        if orders:
+            user['orders'] = self.orders
+        return user
      
      
