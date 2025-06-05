@@ -60,8 +60,8 @@ def change_status(user_id):
 
 @user_bp.route("/get/logs/<int:user_id>", methods=["GET"])
 def get_logs(user_id):
-    logs = get_user_logs(user_id)
-    data = []
+    logs= get_user_logs(user_id)
+    data=[]
     for log in logs:
         log.date = log.date.isoformat()
         data.append(log.to_dict())

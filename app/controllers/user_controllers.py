@@ -29,7 +29,7 @@ def update_user(user_id, update_data):
     if not user:
         return None
 
-    for key, value in updated_data.items():
+    for key, value in update_data.items():
         if key=="password":
             setattr(user, key, generate_password_hah (value))
         else:
@@ -42,12 +42,13 @@ def toggle_user_status(user_id, is_active:str):
     if not user:
         return None
     user.state = is_active
-    db,session.commit()
+    db.session.commit()
     return user
 
 def get_user_logs(user_id):
-    logs = Log.query.filter_by(user_id=user_id).order_by(log.date.desc()).all()
+    logs = Log.query.filter_by(user_id=user_id).order_by(Log.date.desc()).all()
     return logs
+
 
 
 
