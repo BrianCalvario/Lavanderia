@@ -1,116 +1,89 @@
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React from "react";
+import {
+  SafeAreaView,
+  View,
+  Text,
+  Pressable,
+  StyleSheet,
+} from "react-native";
+import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 
-
-export default function Home({navigation}) {
-
-  const handleLogout = async () => {
-  try {
-    await AsyncStorage.removeItem('token')
-    navigation.reset({
-      index: 0,
-      routes: [{ name: 'Login' }],
-    });
-  } catch (error) {
-    console.error('Error al cerrar sesión:', error)
-  }
-};
+export default function Home({ navigation }) {
+  const buttons = [
+    { title: "Crear Cliente", icon: "user-plus", route: "CrearCliente" },
+    { title: "Actualizar Cliente", icon: "user-edit", route: "ActualizarCliente" },
+    { title: "Eliminar Cliente", icon: "user-times", route: "EliminarCliente" },
+    { title: "Buscar Cliente", icon: "search", route: "BuscarCliente" },
+  ];
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Lavanderia</Text>
+    <SafeAreaView style={styles.container}>
+      <Text style={styles.title}>Gestión de Clientes</Text>
 
-      <View style={styles.buttonRow}>
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Crear Cliente')}>
-          <Text style={styles.textButton}>Crear Cliente</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Buscar Cliente')}>
-          <Text style={styles.textButton}>Buscar Cliente</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Eliminar Cliente')}>
-          <Text style={styles.textButton}>Eliminar Cliente</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Crear Orden')}>
-          <Text style={styles.textButton}>Crear Orden</Text>
-        </TouchableOpacity>
+      <View style={styles.buttonsContainer}>
+        {buttons.map(({ title, icon, route }) => (
+          <Pressable
+            key={route}
+            style={({ pressed }) => [
+              styles.button,
+              pressed && styles.buttonPressed,
+            ]}
+            onPress={() => navigation.navigate(route)}
+          >
+            <FontAwesome5 name={icon} size={20} color="#FFF" style={styles.icon} />
+            <Text style={styles.buttonText}>{title.toUpperCase()}</Text>
+          </Pressable>
+        ))}
       </View>
-
-      <View style={styles.logoutContainer}>
-        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <Text style={styles.logoutText}>Cerrar sesión</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#946dd3',
-    padding: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  title: {
-    fontSize: 26,
-    fontWeight: "bold",
-    marginBottom: 30
-  },
-
-  label: {
-    fontSize: 20
-  },
-
-  input: {
-    borderWidth: 2,
-    borderColor: "black",
-    backgroundColor: "white",
-    fontSize: 15,
-    width: "auto"
-  },
-
-  centeredButton: {
-    alignItems: 'center',
-    marginTop: 15
-  },
-
-  button: {
-    backgroundColor: "green",
-    paddingVertical: 10,
+    backgroundColor: "#3A2F1B", 
+    alignItems: "center",
     paddingHorizontal: 20,
-    borderRadius: 6,
-    marginHorizontal: 10
   },
-
-  textButton: {
-    color: "white",
-    fontWeight: "bold",
-    fontSize: 15,
-    textAlign: "center"
+  title: {
+    fontSize: 32,
+    color: "#F5DEB3",
+    marginBottom: 40,
+    fontWeight: "700",
+    textShadowColor: "#000",
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 3,
   },
-
-  buttonRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+  buttonsContainer: {
+    width: "100%",
   },
-
-  logoutContainer: {
-    marginTop: 20
+  button: {
+    backgroundColor: "#8A6E2F", 
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 15,
+    paddingHorizontal: 25,
+    marginBottom: 20,
+    borderRadius: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 3, height: 4 },
+    shadowOpacity: 0.5,
+    shadowRadius: 5,
+    elevation: 7, // para Android
   },
-
-  logoutButton: {
-    backgroundColor: "red"
+  buttonPressed: {
+    backgroundColor: "#B89E4C", 
+    shadowOffset: { width: 1, height: 1 },
+    shadowOpacity: 0.9,
   },
-
-  logoutText: {
-    fontSize: 14,
-    color: "white",
-    paddingVertical: 10,
-    paddingHorizontal: 20
-  }
-})
+  buttonText: {
+    color: "#FFF",
+    fontSize: 18,
+    fontWeight: "600",
+    letterSpacing: 1.2,
+  },
+  icon: {
+    marginRight: 15,
+  },
+});

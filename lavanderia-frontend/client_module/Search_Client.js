@@ -1,4 +1,13 @@
-import { StyleSheet, Text, View, TextInput, Pressable, FlatList, Alert } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
+  Pressable,
+  FlatList,
+  Alert,
+  SafeAreaView,
+} from 'react-native';
 import { useState } from 'react';
 import { API_URL } from '../api';
 import { useNavigation } from '@react-navigation/native';
@@ -18,7 +27,7 @@ export default function SearchClient() {
       } else if (phone) {
         url = `${API_URL}/clients/search/phone?phone=${encodeURIComponent(phone)}`;
       } else {
-        Alert.alert('Error', 'Ingresa un nombre o un número de teléfono');
+        Alert.alert('⚠️ Error', 'Ingresa un nombre o un número de teléfono');
         return;
       }
 
@@ -26,32 +35,49 @@ export default function SearchClient() {
       const data = await response.json();
 
       if (!response.ok) {
-        Alert.alert('No encontrado', data.error || 'Error al buscar cliente');
+        Alert.alert('❌ No encontrado', data.error || 'Error al buscar cliente');
         return;
       }
 
       setResults(Array.isArray(data) ? data : [data]);
     } catch (error) {
-      Alert.alert('Error', 'No se pudo conectar con el servidor');
+      Alert.alert('❌ Error', 'No se pudo conectar con el servidor');
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Pressable onPress={() => navigation.goBack()} style={styles.backButton}><Text style={styles.backButtonText}>← Volver</Text></Pressable>
+    <SafeAreaView style={styles.container}>
+      <Pressable
+        onPress={() => navigation.goBack()}
+        style={styles.backButton}
+      >
+        <Text style={styles.backButtonText}>← Volver</Text>
+      </Pressable>
 
-      <View>
-        <Text style={styles.title}>Buscar Cliente</Text>
+      <Text style={styles.title}>🔍 Buscar Cliente</Text>
 
-        <Text style={styles.label}>Buscar por Nombre</Text>
-        <TextInput style={styles.input} value={name} onChangeText={setName}></TextInput>
+      <Text style={styles.label}>Nombre</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Ingrese un nombre"
+        placeholderTextColor="#8A6E2F"
+        value={name}
+        onChangeText={setName}
+      />
 
-        <Text style={styles.label}>Buscar por Teléfono</Text>
-        <TextInput style={styles.input} value={phone} onChangeText={setPhone}></TextInput>
+      <Text style={styles.label}>Teléfono</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Ingrese un número"
+        placeholderTextColor="#8A6E2F"
+        value={phone}
+        onChangeText={setPhone}
+      />
 
-        <View style={styles.centeredButton}>
-          <Pressable style={styles.button} onPress={handleSearch}><Text style={styles.textButton}>Buscar</Text></Pressable>
-        </View>
+      <View style={styles.centeredButton}>
+        <Pressable style={styles.button} onPress={handleSearch}>
+          <Text style={styles.textButton}>Buscar</Text>
+        </Pressable>
       </View>
 
       <FlatList
@@ -59,92 +85,117 @@ export default function SearchClient() {
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <View style={styles.resultItem}>
-            <Text>Nombre: {item.name}</Text>
-            <Text>ID: {item.id}</Text>
-            <Text>Teléfono: {item.phone_number}</Text>
-            <Text>Dirección: {item.address}</Text>
+            <Text style={styles.resultText}>👤 Nombre: {item.name}</Text>
+            <Text style={styles.resultText}>📞 Teléfono: {item.phone_number}</Text>
+            <Text style={styles.resultText}>🏠 Dirección: {item.address}</Text>
 
             <Pressable
               style={styles.updateButton}
-              onPress={() => navigation.navigate('Actualizar Cliente', { client: item })}
+              onPress={() => navigation.navigate('ActualizarCliente', { client: item })}
             >
-              <Text style={styles.updateButtonText}>Actualizar</Text>
+              <Text style={styles.updateButtonText}>✏️ Editar</Text>
             </Pressable>
           </View>
         )}
       />
-    </View>
-  )
+    </SafeAreaView>
+  );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ae7cff',
+    backgroundColor: '#3A2F1B', // Retro oscuro
     padding: 20,
   },
   title: {
-    fontSize: 26,
+    fontSize: 28,
     fontWeight: 'bold',
     marginBottom: 20,
-    textAlign: 'center'
+    textAlign: 'center',
+    color: '#F5DEB3', // Trigo
+    textShadowColor: '#000',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 3,
   },
   label: {
     fontSize: 18,
-    marginTop: 10
+    marginTop: 10,
+    color: '#F5DEB3',
   },
   input: {
     borderWidth: 2,
     borderRadius: 10,
-    borderColor: 'black',
-    backgroundColor: 'white',
-    fontSize: 15,
-    padding: 8,
+    borderColor: '#8A6E2F', 
+    backgroundColor: '#FFF8E7', 
+    fontSize: 16,
+    padding: 10,
+    color: '#3A2F1B',
+    marginTop: 5,
   },
   centeredButton: {
     alignItems: 'center',
-    marginTop: 15
+    marginTop: 20,
   },
   button: {
-    backgroundColor: 'green',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 6,
+    backgroundColor: '#8A6E2F',
+    paddingVertical: 12,
+    paddingHorizontal: 25,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 3, height: 3 },
+    shadowOpacity: 0.5,
+    shadowRadius: 4,
+    elevation: 5,
   },
   textButton: {
-    color: 'white',
+    color: '#FFF',
     fontWeight: 'bold',
-    fontSize: 15
+    fontSize: 18,
   },
   resultItem: {
-    backgroundColor: '#f2f2f2',
+    backgroundColor: '#F5DEB3',
     marginTop: 10,
-    padding: 10,
-    borderRadius: 6,
+    padding: 15,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 2, height: 2 },
+    shadowOpacity: 0.4,
+    shadowRadius: 3,
+  },
+  resultText: {
+    color: '#3A2F1B',
+    fontSize: 16,
+    marginBottom: 5,
   },
   updateButton: {
     marginTop: 10,
-    backgroundColor: '#ffa500',
-    padding: 8,
-    borderRadius: 6,
-    alignSelf: 'flex-start'
+    backgroundColor: '#8A6E2F',
+    padding: 10,
+    borderRadius: 8,
+    alignItems: 'center',
   },
   updateButtonText: {
-    color: '#fff',
+    color: '#FFF',
     fontWeight: 'bold',
+    fontSize: 16,
   },
   backButton: {
     position: 'absolute',
     top: 40,
     left: 20,
     padding: 8,
-    backgroundColor: '#ffffff90',
-    borderRadius: 6,
+    backgroundColor: '#F5DEB3',
+    borderRadius: 8,
     zIndex: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 1, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 3,
   },
   backButtonText: {
     fontSize: 16,
-    color: '#333',
+    color: '#3A2F1B',
     fontWeight: 'bold',
-  }
-})
+  },
+});
