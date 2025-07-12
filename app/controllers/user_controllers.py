@@ -5,35 +5,38 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from flask_jwt_extended import create_access_token
 from datetime import datetime
 
-
 def login_user(email, password):
-    #Busqueda dee usuario
+    #busqueda usuarios
     user = User.query.filter_by(email=email).first()
+
+    print(password)
+    print(user.password)
     if user and check_password_hash(user.password, password):
+
         access_token = create_access_token(identity=user.id)
-        log= Log(user_id = user.id, action= "login", date= datetime.now())
+        log = Log(user_id=user.id, action="login", date=datetime.now())
         db.session.add(log)
         db.session.commit()
         return access_token
-    return None 
+    return None
 
 def logout_user(user_id):
-    log = Log(user_id =user_id, action="logout", date=datetime.now())
+    log = Log(user_id = user_id, action = "logout", date=datetime.now())
     db.session.add(log)
     db.session.commit()
     return True
 
-def update_user(user_id, update_data):
-    #Buscar el usuario
+def update_user(user_id, updated_data):
+    #Buscar user
     user = User.query.get(user_id)
     if not user:
         return None
-
-    for key, value in update_data.items():
-        if key=="password":
-            setattr(user, key, generate_password_hah (value))
+    
+    for key, value in updated_data.items():
+        if key == "password":
+            setattr(user, key, generate_password_hash(value))
         else:
-            setattr(user,key, value)
+            setattr(user, key, value)
     db.session.commit()
     return user
 
