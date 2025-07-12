@@ -1,92 +1,112 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
-import api from '../api'; 
+import { View, Text, FlatList, StyleSheet, ScrollView } from 'react-native';
+import api from '../api';
 
 export default function OrderView() {
   const [orders, setOrders] = useState([]);
 
   useEffect(() => {
-    api.get('/orders') 
-      .then((res) => setOrders(res.data))
-      .catch((err) => console.error(err));
+    api.get('/orders')
+      .then(res => setOrders(res.data))
+      .catch(err => console.error(err));
   }, []);
+
+  const renderOrderDetails = (details) => {
+    return details.map((detail, index) => (
+      <View key={index} style={styles.detailRow}>
+        <Text style={styles.detailText}>
+          • Prenda: <Text style={styles.detailHighlight}>{detail.garment}</Text>, 
+          Servicio: <Text style={styles.detailHighlight}>{detail.service}</Text>, 
+          Precio: <Text style={styles.detailHighlight}>${detail.price.toFixed(2)}</Text>
+        </Text>
+      </View>
+    ));
+  };
 
   const renderItem = ({ item }) => {
     const total = item.details.reduce((sum, detail) => sum + detail.price, 0);
+
     return (
       <View style={styles.card}>
         <Text style={styles.title}>Cliente: {item.client_name}</Text>
-        {item.details.map((d, i) => (
-          <Text key={i} style={styles.detailText}>
-            Prenda: {d.garment} - Servicio: {d.service} - ${d.price}
-          </Text>
-        ))}
-        <Text style={styles.total}>Total: ${total}</Text>
+        <Text style={styles.subtitle}>Resumen de la orden:</Text>
+        {renderOrderDetails(item.details)}
+        <Text style={styles.total}>Total: ${total.toFixed(2)}</Text>
         <Text style={styles.status}>Estado: {item.status}</Text>
       </View>
     );
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <Text style={styles.header}>Resumen de Órdenes</Text>
       <FlatList
         data={orders}
         keyExtractor={(item) => item.id.toString()}
         renderItem={renderItem}
-        contentContainerStyle={{ paddingBottom: 20 }}
+        contentContainerStyle={{ paddingBottom: 30 }}
       />
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#3A2F1B', 
-    padding: 20,
+  container: { 
+    flex: 1, 
+    padding: 16, 
+    backgroundColor: '#946dd3',
   },
-  header: {
-    fontSize: 26,
-    fontWeight: '700',
-    color: '#F5DEB3', 
-    marginBottom: 20,
+  header: { 
+    fontSize: 24, 
+    fontWeight: 'bold', 
+    marginBottom: 12, 
     textAlign: 'center',
-    textShadowColor: '#000',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 3,
+    color: 'black',
   },
   card: {
-    backgroundColor: '#8A6E2F', 
-    padding: 15,
+    backgroundColor: '#f5f0e6', 
+    padding: 16,
     marginBottom: 15,
-    borderRadius: 12,
+    borderRadius: 10,
     shadowColor: '#000',
-    shadowOffset: { width: 3, height: 3 },
-    shadowOpacity: 0.6,
-    shadowRadius: 5,
-    elevation: 7,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 1,
+    elevation: 2,
   },
-  title: {
-    fontWeight: '700',
-    fontSize: 18,
-    color: '#FFF8E7', 
+  title: { 
+    fontWeight: 'bold', 
+    fontSize: 18, 
     marginBottom: 8,
+    color: '#5b3a29', 
   },
-  detailText: {
-    color: '#FFF8E7',
-    fontSize: 14,
-    marginBottom: 4,
-  },
-  total: {
-    marginTop: 8,
-    fontWeight: '700',
+  subtitle: { 
+    fontWeight: '600', 
+    marginBottom: 6, 
     fontSize: 16,
-    color: '#F5DEB3',
+    color: '#5b3a29',
   },
-  status: {
-    marginTop: 4,
-    fontStyle: 'italic',
-    color: '#FFF8E7',
+  detailRow: { 
+    marginBottom: 4 
+  },
+  detailText: { 
+    fontSize: 15, 
+    color: '#5b3a29',
+  },
+  detailHighlight: { 
+    fontWeight: 'bold', 
+    color: '#3e2f22', 
+  },
+  total: { 
+    marginTop: 10, 
+    fontWeight: 'bold', 
+    fontSize: 16,
+    color: '#5b3a29',
+  },
+  status: { 
+    marginTop: 6, 
+    fontSize: 14, 
+    fontStyle: 'italic', 
+    color: '#7d6e65',
   },
 });
